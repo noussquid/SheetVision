@@ -7,28 +7,28 @@ from best_fit import fit
 from rectangle import Rectangle
 from note import Note
 from random import randint
-from midiutil.MidiFile3 import MIDIFile
+from midiutil import MIDIFile
 
 staff_files = [
-    "resources/template/staff2.png", 
+    "resources/template/staff2.png",
     "resources/template/staff.png"]
 quarter_files = [
-    "resources/template/quarter.png", 
+    "resources/template/quarter.png",
     "resources/template/solid-note.png"]
 sharp_files = [
     "resources/template/sharp.png"]
 flat_files = [
-    "resources/template/flat-line.png", 
+    "resources/template/flat-line.png",
     "resources/template/flat-space.png" ]
 half_files = [
-    "resources/template/half-space.png", 
+    "resources/template/half-space.png",
     "resources/template/half-note-line.png",
-    "resources/template/half-line.png", 
+    "resources/template/half-line.png",
     "resources/template/half-note-space.png"]
 whole_files = [
-    "resources/template/whole-space.png", 
+    "resources/template/whole-space.png",
     "resources/template/whole-note-line.png",
-    "resources/template/whole-line.png", 
+    "resources/template/whole-line.png",
     "resources/template/whole-note-space.png"]
 
 staff_imgs = [cv2.imread(staff_file, 0) for staff_file in staff_files]
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         r.draw(staff_boxes_img, (0, 0, 255), 2)
     cv2.imwrite('staff_boxes_img.png', staff_boxes_img)
     open_file('staff_boxes_img.png')
-    
+
     print("Matching sharp image...")
     sharp_recs = locate_images(img_gray, sharp_imgs, sharp_lower, sharp_upper, sharp_thresh)
 
@@ -171,15 +171,15 @@ if __name__ == "__main__":
 
     note_groups = []
     for box in staff_boxes:
-        staff_sharps = [Note(r, "sharp", box) 
+        staff_sharps = [Note(r, "sharp", box)
             for r in sharp_recs if abs(r.middle[1] - box.middle[1]) < box.h*5.0/8.0]
-        staff_flats = [Note(r, "flat", box) 
+        staff_flats = [Note(r, "flat", box)
             for r in flat_recs if abs(r.middle[1] - box.middle[1]) < box.h*5.0/8.0]
-        quarter_notes = [Note(r, "4,8", box, staff_sharps, staff_flats) 
+        quarter_notes = [Note(r, "4,8", box, staff_sharps, staff_flats)
             for r in quarter_recs if abs(r.middle[1] - box.middle[1]) < box.h*5.0/8.0]
-        half_notes = [Note(r, "2", box, staff_sharps, staff_flats) 
+        half_notes = [Note(r, "2", box, staff_sharps, staff_flats)
             for r in half_recs if abs(r.middle[1] - box.middle[1]) < box.h*5.0/8.0]
-        whole_notes = [Note(r, "1", box, staff_sharps, staff_flats) 
+        whole_notes = [Note(r, "1", box, staff_sharps, staff_flats)
             for r in whole_recs if abs(r.middle[1] - box.middle[1]) < box.h*5.0/8.0]
         staff_notes = quarter_notes + half_notes + whole_notes
         staff_notes.sort(key=lambda n: n.rec.x)
@@ -209,23 +209,23 @@ if __name__ == "__main__":
     flat_recs_img = img.copy()
     for r in flat_recs:
         r.draw(img, (0, 0, 255), 2)
-        
+
     cv2.imwrite('res.png', img)
     open_file('res.png')
-   
+
     for note_group in note_groups:
         print([ note.note + " " + note.sym for note in note_group])
 
     midi = MIDIFile(1)
-     
-    track = 0   
+
+    track = 0
     time = 0
     channel = 0
     volume = 100
-    
+
     midi.addTrackName(track, time, "Track")
     midi.addTempo(track, time, 140)
-    
+
     for note_group in note_groups:
         duration = None
         for note in note_group:
